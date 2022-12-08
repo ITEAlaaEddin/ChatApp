@@ -11,6 +11,8 @@ import java.util.Date;
 
 // the server that can be run as a console
 public class Server {
+
+	public int temp;
 	// a unique ID for each connection
 	private static int uniqueId;
 	// an ArrayList to keep the list of the Client
@@ -127,9 +129,12 @@ public class Server {
 			{
 				ClientThread ct1=al.get(y);
 				String check=ct1.getUsername();
+				/*if(temp == ct1.id)
+					ct1.writeMsg(messageLf);*/
 				if(check.equals(tocheck))
 				{
 					// try to write to the Client if it fails remove it from the list
+
 					if(!ct1.writeMsg(messageLf)) {
 						al.remove(y);
 						display("Disconnected Client " + ct1.username + " removed from list.");
@@ -138,9 +143,6 @@ public class Server {
 					found=true;
 					break;
 				}
-				
-				
-				
 			}
 			// mentioned user not found, return false
 			if(found!=true)
@@ -238,6 +240,7 @@ public class Server {
 		ClientThread(Socket socket) {
 			// a unique id
 			id = ++uniqueId;
+			temp = id;
 			this.socket = socket;
 			//Creating both Data Stream
 			System.out.println("Thread trying to create Object Input/Output Streams");
@@ -331,7 +334,7 @@ public class Server {
 		}
 
 		// write a String to the Client output stream
-		private boolean writeMsg(String msg) {
+		public boolean writeMsg(String msg) {
 			// if Client is still connected send the message to it
 			if(!socket.isConnected()) {
 				close();
