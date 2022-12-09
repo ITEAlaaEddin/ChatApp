@@ -38,7 +38,7 @@
          <children>
             <ImageView fitHeight="92.0" fitWidth="95.0">
                <image>
-                  <Image url="@../ghvjg.png" />
+                  <Image url="@ghvjg.png" />
                </image>
             </ImageView>
             <ListView fx:id="list_users" prefHeight="496.0" prefWidth="100.0" />
