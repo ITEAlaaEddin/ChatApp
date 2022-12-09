@@ -1,5 +1,8 @@
 package sample;
 
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -25,12 +28,26 @@ public class Controller {
     @FXML
     public ListView list_show;
     @FXML ListView list_users;
-    public void setText_show(String msg){
+
+    Client client;
+
+    public void setUserList(String msg) {
+
+        /*
+        Platform.runLater(() -> {
+            ObservableList<String> users = FXCollections.observableList();
+            list_users.setItems(users);
+
+
+        });*/
+
+    }
+    public void setText_show(ChatMessage chatMessage){
         Task<HBox> othersMessages = new Task<HBox>() {
             @Override
             public HBox call() throws Exception {
                 BubbledLabel bl6 = new BubbledLabel();
-                bl6.setText(msg);
+                bl6.setText(chatMessage.Date+" "+chatMessage.message);
 
                 bl6.setBackground(new Background(new BackgroundFill(Color.WHITE,null, null)));
                 HBox x = new HBox();
@@ -49,7 +66,7 @@ public class Controller {
             @Override
             public HBox call() throws Exception {
                 BubbledLabel bl6 = new BubbledLabel();
-                bl6.setText(msg);
+                bl6.setText(chatMessage.message+" "+chatMessage.Date);
 
                 bl6.setBackground(new Background(new BackgroundFill(Color.LIGHTGREEN,
                         null, null)));
@@ -63,10 +80,10 @@ public class Controller {
             }
         };
         yourMessages.setOnSucceeded(event -> list_show.getItems().add(yourMessages.getValue()));
-        String[] name = msg.split(" ",2);
 
-        System.out.println(" hh "+name[1].split(":",2)[0]+" hh "+LoginController.MyClient.getUsername());
-        if (name[1].split(":",2)[0].equals(LoginController.MyClient.getUsername())) {
+
+
+        if (!chatMessage.FromOther) {
             Thread t2 = new Thread(yourMessages);
             t2.setDaemon(true);
             t2.start();
@@ -79,7 +96,8 @@ public class Controller {
 
     }
     public void initialize(){
-         Client client = LoginController.MyClient;
+        client = LoginController.MyClient;
+        //client.getUsers();
          if(!client.start())
              return;
 
@@ -94,25 +112,23 @@ public class Controller {
                 String msg = text_send.getText();
                 // logout if message is LOGOUT
                 if(msg.equalsIgnoreCase("LOGOUT")) {
-                    client.sendMessage(new ChatMessage(ChatMessage.LOGOUT, ""));
-
-
+                    client.sendMessage(new ChatMessage(ChatMessage.LOGOUT, client.getUsername()));
                     // client completed its job. disconnect client.
                     client.disconnect();
 
                 }
 
                 // message to check who are present in chatroom
-                else if(msg.equalsIgnoreCase("WHOISIN")) {
+                /*else if(msg.equalsIgnoreCase("WHOISIN")) {
                     client.sendMessage(new ChatMessage(ChatMessage.WHOISIN, ""));
-                }
+                }*/
                 // regular text message
                 else {
-                    client.sendMessage(new ChatMessage(ChatMessage.MESSAGE, msg));
-                    String[] tempMsg = msg.split(" ",2);
-                    msg = "@"+client.getUsername()+" "+tempMsg[1];
-                    client.sendMessage(new ChatMessage(ChatMessage.MESSAGE, msg));
-                    System.out.println("from me"+msg);
+                    ChatMessage chatMessage = new ChatMessage(ChatMessage.MESSAGE, msg ,client.getUsername(),"ismail");
+                    client.sendMessage(chatMessage);
+                    chatMessage.FromOther = false;
+                    setText_show(chatMessage);
+
                 }
             }
         });

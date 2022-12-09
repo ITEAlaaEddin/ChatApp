@@ -4,14 +4,13 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 
 //The Client that can be run as a console
 public class Client  {
 
-	private static Client client = null;
-	
 	// notification
 	private String notif = " *** ";
 
@@ -78,7 +77,7 @@ public class Client  {
 		// will send as a String. All other messages will be ChatMessage objects
 		try
 		{
-			sOutput.writeObject(username);
+			sOutput.writeObject(new ChatMessage(ChatMessage.MESSAGE,"",username,""));
 		}
 		catch (IOException eIO) {
 			display("Exception doing login : " + eIO);
@@ -97,6 +96,22 @@ public class Client  {
 		System.out.println(msg);
 
 	}
+
+	/*public void getUsers(){
+		sendMessage(new ChatMessage(ChatMessage.WHOISIN, ""));
+		try {
+			Thread thread = new ListenFromServer();
+			@Override
+			public void run() {}
+			thread.start();
+			String msg = (String) thread.sInput.readObject();
+			System.out.println("hh "+msg);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+	}*/
 
 	/*
 	 * To send a message to the server
@@ -153,12 +168,12 @@ public class Client  {
 			while(true) {
 				try {
 					// read the message form the input datastream
-					String msg = (String) sInput.readObject();
+					ChatMessage chatMessage = (ChatMessage) sInput.readObject();
 					// print the message
-					System.out.println(msg);
+					System.out.println(chatMessage.SenderUserName +": "+chatMessage.message);
 					System.out.print("> ");
 					Controller myController= Main.Controller;
-					myController.setText_show(msg);
+					myController.setText_show(chatMessage);
 
 				}
 				catch(IOException e) {

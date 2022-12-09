@@ -1,6 +1,9 @@
 package sample;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 /*
  * This class defines the different type of messages that will be exchanged between the
  * Clients and the Server. 
@@ -14,14 +17,26 @@ public class ChatMessage implements Serializable {
 	// WHOISIN to receive the list of the users connected
 	// MESSAGE an ordinary text message
 	// LOGOUT to disconnect from the Server
-	static final int WHOISIN = 0, MESSAGE = 1, LOGOUT = 2;
+	static final int WHOISIN = 0, MESSAGE = 1, LOGOUT = 2, IsLeftUserName = 3,IsJoinedUserName=4;
 	private int type;
 	public String message;
-	
+	public String SenderUserName = "",ReceiverUserName = "",JoinLeftUserName ="";
+	public ArrayList<String>  WhoIsInUsers = new ArrayList<String>();
+	public SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+	public String Date;
+	public boolean FromOther= true;
 	// constructor
-	ChatMessage(int type, String message) {
+	ChatMessage(int type, String message, String SenderUserName , String ReceiverUserName) {
 		this.type = type;
 		this.message = message;
+		this.ReceiverUserName=ReceiverUserName;
+		this.SenderUserName=SenderUserName;
+		this.Date = this.sdf.format(new Date());
+	}
+
+	ChatMessage(int type,String JoinLeftUserName) {
+		this.type = type;
+		this.JoinLeftUserName=JoinLeftUserName;
 	}
 	
 	int getType() {
