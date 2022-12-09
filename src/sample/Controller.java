@@ -58,6 +58,7 @@ public class Controller {
     public  void AddUserToUserList(String userName){
         User user = new User(userName);
         Users.add(user);
+
         Platform.runLater(() -> {
             list_users.getItems().add(user.Btn);
         });
