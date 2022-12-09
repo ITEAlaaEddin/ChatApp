@@ -143,6 +143,7 @@ public class Server {
 			// because it has disconnected
 			for(ClientThread ct : ListOfClients) {
 				// try to write to the Client if it fails remove it from the list
+				//System.out.println("send from brodcast success "+chatMessage.JoinLeftUserName);
 				if(!ct.writeMsg(chatMessage)) {
 					ListOfClients.remove(ct);
 					display("Disconnected Client " + ct.username + " removed from list.");
@@ -166,7 +167,8 @@ public class Server {
 				break;
 			}
 		}
-		ChatMessage left = new ChatMessage(3,disconnectedClient);
+		ChatMessage left = new ChatMessage(ChatMessage.IsLeftUserName,disconnectedClient);
+		left.ReceiverUserName= "brodcast";
 		broadcast(left);
 	}
 	
@@ -228,7 +230,8 @@ public class Server {
 				// read the username
 				ChatMessage chatMessage= (ChatMessage) sInput.readObject();
 				username = chatMessage.SenderUserName;
-				ChatMessage join = new ChatMessage(ChatMessage.IsJoinedUserName,chatMessage.JoinLeftUserName);
+				ChatMessage join = new ChatMessage(ChatMessage.IsJoinedUserName,username);
+				join.ReceiverUserName = "brodcast";
 				broadcast(join);
 			}
 			catch (IOException e) {
@@ -282,6 +285,8 @@ public class Server {
 				case ChatMessage.WHOISIN:
 					ChatMessage chatMessage = new ChatMessage(ChatMessage.WHOISIN,"");
 					for(ClientThread client:ListOfClients){
+						if(client.id==this.id)
+							continue;
 						chatMessage.WhoIsInUsers.add(client.username);
 					}
 					writeMsg(chatMessage);

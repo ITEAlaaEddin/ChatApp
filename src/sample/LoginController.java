@@ -18,6 +18,9 @@ public class LoginController {
     public TextField text_ip;
     @FXML
     public TextField text_port;
+    @FXML
+    public TextField text_password;
+
     public static Client MyClient;
 
     public void initialize(){
@@ -27,6 +30,7 @@ public class LoginController {
             public void handle(MouseEvent event) {
                 MyClient = new Client(text_ip.getText(), Integer.parseInt(text_port.getText()), text_userName.getText());
                 Main m = new Main();
+                Main.ControllerName="Controller";
                 try {
                     m.changeScene("sample.fxml");
                 } catch (IOException e) {

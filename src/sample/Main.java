@@ -13,6 +13,7 @@ import java.util.Scanner;
 public class Main extends Application {
 
     public static Controller Controller;
+    public static String ControllerName;
     private static Stage stg;
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -22,14 +23,15 @@ public class Main extends Application {
         Parent window = (Pane) fmxlLoader.load();
         //Controller = fmxlLoader.<Controller>getController();
         primaryStage.setTitle("Hello World");
-        primaryStage.setScene(new Scene(window, 500, 500));
+        primaryStage.setScene(new Scene(window, 800, 500));
         primaryStage.show();
     }
 
     public void changeScene(String fxml) throws IOException {
         FXMLLoader fmxlLoader = new FXMLLoader(getClass().getResource(fxml));
         Parent window = (Pane) fmxlLoader.load();
-        Controller = fmxlLoader.<Controller>getController();
+        if(ControllerName.equalsIgnoreCase("Controller"))
+            Controller = fmxlLoader.<Controller>getController();
         stg.getScene().setRoot(window);
 
     }

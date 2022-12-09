@@ -1,5 +1,8 @@
 package sample;
 
+import javafx.scene.paint.Color;
+
+import java.awt.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -21,6 +24,8 @@ public class Client  {
 
 	private String server, username;	// server and username
 	private int port;					//port
+
+
 
 	public String getUsername() {
 		return username;
@@ -169,19 +174,50 @@ public class Client  {
 				try {
 					// read the message form the input datastream
 					ChatMessage chatMessage = (ChatMessage) sInput.readObject();
-					// print the message
-					System.out.println(chatMessage.SenderUserName +": "+chatMessage.message);
-					System.out.print("> ");
 					Controller myController= Main.Controller;
-					myController.setText_show(chatMessage);
+					switch (chatMessage.getType()){
+						case ChatMessage.MESSAGE:
+							// print the message
+							System.out.println(chatMessage.SenderUserName +": "+chatMessage.message);
+							System.out.print("> ");
+							if(chatMessage.SenderUserName.equals(Controller.ReciverUserName))
+							    myController.setText_show(chatMessage);
+							User ouser =null;
+							for(User user:myController.Users){
+								if(user.UserName.equals(chatMessage.SenderUserName)){
+									ouser=user;
+									break;
+								}
+							}
+							if(ouser!=null) {
+								ouser.Messages.add(chatMessage);
+								ouser.Btn.setTextFill(Color.RED);
+							}
+							break;
+						case ChatMessage.WHOISIN:
+							myController.setUserList(chatMessage.WhoIsInUsers);
+							break;
+						case  ChatMessage.IsJoinedUserName:
+							myController.AddUserToUserList(chatMessage.JoinLeftUserName);
+							System.out.println(chatMessage.JoinLeftUserName);
+							break;
+						case ChatMessage.IsLeftUserName:
+							myController.removeUserFromUserList(chatMessage.JoinLeftUserName);
+							System.out.println("second removed "+chatMessage.JoinLeftUserName);
+							break;
+						default:
+							throw new IOException();
+
+					}
 
 				}
 				catch(IOException e) {
 					display(notif + "Server has closed the connection: " + e + notif);
 					break;
+				} catch (ClassNotFoundException e) {
+					e.printStackTrace();
 				}
-				catch(ClassNotFoundException e2) {
-				}
+
 			}
 		}
 	}

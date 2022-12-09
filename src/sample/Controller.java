@@ -1,23 +1,25 @@
 package sample;
 
+
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
+
+import java.io.IOException;
+import java.util.ArrayList;
 
 
 public class Controller {
@@ -27,22 +29,56 @@ public class Controller {
     public TextArea text_send;
     @FXML
     public ListView list_show;
-    @FXML ListView list_users;
+    @FXML
+    public ListView list_users;
+    @FXML
+    public Button button_logout;
 
     Client client;
 
-    public void setUserList(String msg) {
+   // public User user;
+    public static String ReciverUserName;
 
-        /*
+    ArrayList<User> Users = new ArrayList<User>();
+
+    public void setUserList(ArrayList<String> usersName) {
+
+        for (String userName : usersName )
+        {
+            User user = new User(userName);
+            Users.add(user);
+            Platform.runLater(() -> {
+                list_users.getItems().add(user.Btn);
+            });
+
+        }
+
+    }
+
+    public  void AddUserToUserList(String userName){
+        User user = new User(userName);
+        Users.add(user);
         Platform.runLater(() -> {
-            ObservableList<String> users = FXCollections.observableList();
-            list_users.setItems(users);
+            list_users.getItems().add(user.Btn);
+        });
 
+    }
 
-        });*/
+    public void removeUserFromUserList(String username){
+        for(User user : Users){
+            if(user.UserName.equals(username)){
+                Platform.runLater(() -> {
+                    list_users.getItems().remove(user.Btn);
+                    System.out.println("removed !");
+                });
+                Users.remove(user);
+                break;
+            }
+        }
 
     }
     public void setText_show(ChatMessage chatMessage){
+
         Task<HBox> othersMessages = new Task<HBox>() {
             @Override
             public HBox call() throws Exception {
@@ -61,6 +97,7 @@ public class Controller {
         othersMessages.setOnSucceeded(event -> {
             list_show.getItems().add(othersMessages.getValue());
         });
+       // ouser.Messages.getItems().add(othersMessages.getValue());
 
         Task<HBox> yourMessages = new Task<HBox>() {
             @Override
@@ -79,7 +116,12 @@ public class Controller {
                 return x;
             }
         };
-        yourMessages.setOnSucceeded(event -> list_show.getItems().add(yourMessages.getValue()));
+        yourMessages.setOnSucceeded(event ->{
+            list_show.getItems().add(yourMessages.getValue());
+
+                }
+        );
+        //ouser.Messages.getItems().add(othersMessages.getValue());
 
 
 
@@ -100,7 +142,7 @@ public class Controller {
         //client.getUsers();
          if(!client.start())
              return;
-
+        client.sendMessage(new ChatMessage(ChatMessage.WHOISIN,""));
         HBox x = new HBox();
 
         button_send.setOnMouseReleased(new EventHandler<MouseEvent>() {
@@ -124,12 +166,42 @@ public class Controller {
                 }*/
                 // regular text message
                 else {
-                    ChatMessage chatMessage = new ChatMessage(ChatMessage.MESSAGE, msg ,client.getUsername(),"ismail");
-                    client.sendMessage(chatMessage);
-                    chatMessage.FromOther = false;
-                    setText_show(chatMessage);
+                    User ouser =null;
+                    for(User user:Users){
+                        if(user.UserName.equals(ReciverUserName)){
+                            ouser=user;
+                            break;
+                        }
+                    }
+                    if(ouser!=null) {
+                        ChatMessage chatMessage = new ChatMessage(ChatMessage.MESSAGE, msg, client.getUsername(), ReciverUserName);
+                        client.sendMessage(chatMessage);
+                        chatMessage.FromOther = false;
+                        ouser.Messages.add(chatMessage);
+                        setText_show(chatMessage);
+                    }
+                    else
+                        System.out.println("select user please");
+
+
+
 
                 }
+            }
+        });
+
+        button_logout.setOnMouseReleased(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                client.sendMessage(new ChatMessage(ChatMessage.LOGOUT,""));
+                Main m = new Main();
+                Main.ControllerName="LoginController";
+                try {
+                    m.changeScene("Login.fxml");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
             }
         });
     }
