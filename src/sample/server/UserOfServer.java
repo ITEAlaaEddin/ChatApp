@@ -2,10 +2,12 @@ package sample.server;
 
 public class UserOfServer {
 
-    public String UserName , Password;
+    public String UserName, Password;
+
     public UserOfServer() {
 
     }
+
     public UserOfServer(String userName, String password) {
         UserName = userName;
         Password = password;

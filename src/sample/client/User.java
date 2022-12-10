@@ -2,13 +2,12 @@ package sample.client;
 
 import javafx.event.Event;
 import javafx.event.EventHandler;
-
-import java.util.ArrayList;
-
 import javafx.scene.control.Button;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.paint.Color;
 import sample.ChatMessage;
+
+import java.util.ArrayList;
 
 
 public class User {
@@ -16,7 +15,7 @@ public class User {
     public Button Btn;
     public ArrayList<ChatMessage> Messages;
     public String UserName;
-    public ChatController MyController = Main.Controller;
+    public ChatController MyController = Main.ChatController;
 
     public User(String userName) {
         Messages = new ArrayList<ChatMessage>();
@@ -35,11 +34,13 @@ public class User {
                 shadow.setRadius(10);
                 shadow.setColor(Color.BLUE);
                 Btn.setEffect(shadow);
-                //MyController.list_show=Messages;
                 Btn.setTextFill(Color.WHITE);
+
+                //clear previous chat
                 MyController.list_show.getItems().clear();
-                ChatController.ReciverUserName=UserName;
-                for(ChatMessage message:Messages){
+                ChatController.ReciverUserName = UserName;
+                //display messages
+                for (ChatMessage message : Messages) {
                     MyController.setText_show(message);
                 }
 
@@ -50,7 +51,7 @@ public class User {
             @Override
             public void handle(Event event) {
                 Btn.setEffect(null);
-                Main.Controller.label_user.setText(userName);
+                Main.ChatController.label_user.setText(userName);
 
             }
         });

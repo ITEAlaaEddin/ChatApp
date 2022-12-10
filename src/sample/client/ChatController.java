@@ -3,14 +3,14 @@ package sample.client;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.HBox;
@@ -41,12 +41,11 @@ public class ChatController {
    // public User user;
     public static String ReciverUserName;
 
-    ArrayList<User> Users = new ArrayList<User>();
+    ArrayList<User> Users = new ArrayList<>();
 
-    public void setUserList(ArrayList<String> usersName) {
+    public void setUsersList(ArrayList<String> usersName) {
 
-        for (String userName : usersName )
-        {
+        for (String userName : usersName) {
             User user = new User(userName);
             Users.add(user);
             Platform.runLater(() -> {
@@ -79,24 +78,24 @@ public class ChatController {
         }
 
     }
-   // new 0000000000000000000000000000000000000000000000000000000000000000000000
+
+
     private void autoScrollMessageList() {
-        if (list_show.getItems().size() > 14/*where size equals possible items to display*/) {
+
+        if (list_show.getItems().size() > 14) { /*where size equals possible items to display*/
             list_show.scrollTo(list_show.getItems().size() - 1);
         }
     }
 
     public void setText_show(ChatMessage chatMessage){
 
-
-
         Task<HBox> othersMessages = new Task<HBox>() {
             @Override
-            public HBox call() throws Exception {
+            public HBox call() {
                 BubbledLabel bl6 = new BubbledLabel();
-                bl6.setText(chatMessage.Date+" "+chatMessage.message);
+                bl6.setText(chatMessage.Date + " " + chatMessage.Message);
 
-                bl6.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,null, null)));
+                bl6.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, null, null)));
                 HBox x = new HBox();
                 bl6.setBubbleSpec(BubbleSpec.FACE_LEFT_CENTER);
                 x.getChildren().addAll(bl6);
@@ -109,13 +108,13 @@ public class ChatController {
             list_show.getItems().add(othersMessages.getValue());
             autoScrollMessageList();
         });
-       // ouser.Messages.getItems().add(othersMessages.getValue());
+
 
         Task<HBox> yourMessages = new Task<HBox>() {
             @Override
-            public HBox call() throws Exception {
+            public HBox call() {
                 BubbledLabel bl6 = new BubbledLabel();
-                bl6.setText(chatMessage.message+" "+chatMessage.Date);
+                bl6.setText(chatMessage.Message + " " + chatMessage.Date);
 
                 bl6.setBackground(new Background(new BackgroundFill(Color.LIGHTBLUE,
                         null, null)));
@@ -134,8 +133,6 @@ public class ChatController {
 
                 }
         );
-        //ouser.Messages.getItems().add(othersMessages.getValue());
-
 
 
         if (!chatMessage.FromOther) {
@@ -148,9 +145,6 @@ public class ChatController {
             t.start();
         }
 
-
-
-
     }
 
 
@@ -161,84 +155,51 @@ public class ChatController {
         button_logout.setTextFill(Color.WHITE);
         text_send.clear();
         client = LoginController.MyClient;
-        //client.getUsers();
 
         client.sendMessage(new ChatMessage(ChatMessage.WHOISIN,""));
-        HBox x = new HBox();
 
 
         text_send.addEventFilter(KeyEvent.KEY_PRESSED, ke -> {
+            if (ke.getCode().equals(KeyCode.ENTER)) {
 
+                if (!text_send.getText().isEmpty()) {
 
-                //System.out.println(event.getCode());
-                if(ke.getCode().equals(KeyCode.ENTER)){
-                    if (!text_send.getText().isEmpty()) {
-                        System.out.print("> ");
-                        // read message from user
-                        String msg = text_send.getText();
-                        // logout if message is LOGOUT
-                        if(msg.equalsIgnoreCase("LOGOUT")) {
-                            client.sendMessage(new ChatMessage(ChatMessage.LOGOUT, client.getUsername()));
-                            // client completed its job. disconnect client.
-                            client.disconnect();
+                    String msg = text_send.getText();
 
+                    // regular text message
+                    User ouser = null;
+                    for (User user : Users) {
+                        if (user.UserName.equals(ReciverUserName)) {
+                            ouser = user;
+                            break;
                         }
-
-                        // message to check who are present in chatroom
-                /*else if(msg.equalsIgnoreCase("WHOISIN")) {
-                    client.sendMessage(new ChatMessage(ChatMessage.WHOISIN, ""));
-                }*/
-                        // regular text message
-                        else {
-                            User ouser =null;
-                            for(User user:Users){
-                                if(user.UserName.equals(ReciverUserName)){
-                                    ouser=user;
-                                    break;
-                                }
-                            }
-                            if(ouser!=null) {
-                                ChatMessage chatMessage = new ChatMessage(ChatMessage.MESSAGE, msg, client.getUsername(), ReciverUserName);
-                                client.sendMessage(chatMessage);
-                                chatMessage.FromOther = false;
-                                ouser.Messages.add(chatMessage);
-                                setText_show(chatMessage);
-                            }
-                            else
-                                System.out.println("select user please");
-
-
-
-
-                        }
-                        //  }
-
-                        text_send.clear();
-
                     }
-                    ke.consume();
-                    }
+                    if (ouser != null) {
+                        ChatMessage chatMessage = new ChatMessage(ChatMessage.MESSAGE, msg, client.getUsername(), ReciverUserName);
+                        client.sendMessage(chatMessage);
+                        chatMessage.FromOther = false;
+                        ouser.Messages.add(chatMessage);
+                        setText_show(chatMessage);
+                    } else
+                        System.out.println("select user please");
 
+                    text_send.clear();
 
-
+                }
+            }
         });
 
 
-
-
-        button_logout.setOnMouseReleased(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                client.sendMessage(new ChatMessage(ChatMessage.LOGOUT,""));
-                Main m = new Main();
-                Main.ControllerName="LoginController";
-                try {
-                    m.changeScene("resources/Login.fxml");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
+        button_logout.setOnMouseReleased(event -> {
+            client.sendMessage(new ChatMessage(ChatMessage.LOGOUT));
+            Main m = new Main();
+            Main.ControllerName = "LoginController";
+            try {
+                m.changeScene("resources/Login.fxml");
+            } catch (IOException e) {
+                e.printStackTrace();
             }
+
         });
     }
 }

@@ -10,28 +10,21 @@ import java.net.Socket;
 
 
 //The Client that can be run as a console
-public class Client  {
+public class Client {
 
-	// notification
-	private String notif = " *** ";
 
+	private final String server, username, Password;    // server and username
+	private final int port;                    //port
 	// for I/O
-	private ObjectInputStream sInput;		// to read from the socket
-	private ObjectOutputStream sOutput;		// to write on the socket
-	private Socket socket;					// socket object
-
-	private String server, username,Password;	// server and username
-	private int port;					//port
-
+	private ObjectInputStream sInput;        // to read from the socket
+	private ObjectOutputStream sOutput;        // to write on the socket
+	private Socket socket;                    // socket object
 
 
 	public String getUsername() {
 		return username;
 	}
 
-	public void setUsername(String username) {
-		this.username = username;
-	}
 
 	/*
 	 *  Constructor to set below things
@@ -40,15 +33,16 @@ public class Client  {
 	 *  username: the username
 	 */
 
-	Client(String server, int port, String username,String password) {
+	Client(String server, int port, String username, String password) {
 		this.server = server;
 		this.port = port;
 		this.username = username;
-		this.Password=password;
+		this.Password = password;
 	}
 
-	public void confirmLogin(String password){
-		sendMessage(new ChatMessage(ChatMessage.CheckLogin,username,password));
+	public void checkLogin(String password) {
+
+		sendMessage(new ChatMessage(ChatMessage.CheckLogin, username, password));
 	}
 
 	/*
@@ -61,12 +55,10 @@ public class Client  {
 		}
 		// exception handler if it failed
 		catch(Exception ec) {
-			display("Error connectiong to server:" + ec);
+			display("Error connecting to server:" + ec);
 			return false;
 		}
 
-		String msg = "Connection accepted " + socket.getInetAddress() + ":" + socket.getPort();
-		display(msg);
 
 		/* Creating both Data Stream */
 		try
@@ -105,21 +97,6 @@ public class Client  {
 
 	}
 
-	/*public void getUsers(){
-		sendMessage(new ChatMessage(ChatMessage.WHOISIN, ""));
-		try {
-			Thread thread = new ListenFromServer();
-			@Override
-			public void run() {}
-			thread.start();
-			String msg = (String) thread.sInput.readObject();
-			System.out.println("hh "+msg);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-	}*/
 
 	/*
 	 * To send a message to the server
@@ -139,32 +116,15 @@ public class Client  {
 	 */
 	public void disconnect() {
 		try {
-			if(sInput != null) sInput.close();
+			if (sInput != null) sInput.close();
+			if (sOutput != null) sOutput.close();
+			if (socket != null) socket.close();
+		} catch (Exception e) {
+			display(e.toString());
 		}
-		catch(Exception e) {}
-		try {
-			if(sOutput != null) sOutput.close();
-		}
-		catch(Exception e) {}
-        try{
-			if(socket != null) socket.close();
-		}
-		catch(Exception e) {}
+
 
 	}
-	/*
-	 * To start the Client in console mode use one of the following command
-	 * > java Client
-	 * > java Client username
-	 * > java Client username portNumber
-	 * > java Client username portNumber serverAddress
-	 * at the console prompt
-	 * If the portNumber is not specified 1500 is used
-	 * If the serverAddress is not specified "localHost" is used
-	 * If the username is not specified "Anonymous" is used
-	 */
-
-
 
 
 	/*
@@ -177,44 +137,44 @@ public class Client  {
 				try {
 					// read the message form the input datastream
 					ChatMessage chatMessage = (ChatMessage) sInput.readObject();
-					ChatController myController= Main.Controller;
-					switch (chatMessage.getType()){
+					ChatController chatController = Main.ChatController;
+					switch (chatMessage.getType()) {
 						case ChatMessage.MESSAGE:
 							// print the message
-							System.out.println(chatMessage.SenderUserName +": "+chatMessage.message);
-							System.out.print("> ");
-							if(chatMessage.SenderUserName.equals(ChatController.ReciverUserName))
-							    myController.setText_show(chatMessage);
-							User ouser =null;
-							for(User user:myController.Users){
-								if(user.UserName.equals(chatMessage.SenderUserName)){
-									ouser=user;
+							if (chatMessage.SenderUserName.equals(ChatController.ReciverUserName))
+								chatController.setText_show(chatMessage);
+							//storing message
+							User userPointer = null;
+							for (User user : chatController.Users) {
+								if (user.UserName.equals(chatMessage.SenderUserName)) {
+									userPointer = user;
 									break;
 								}
 							}
-							if(ouser!=null) {
-								ouser.Messages.add(chatMessage);
-								if(!chatMessage.SenderUserName.equals(ChatController.ReciverUserName))
-								{
-									ouser.Btn.setTextFill(Color.RED);
+							if (userPointer != null) {
+								userPointer.Messages.add(chatMessage);
+								//dont light the button when iam in the same chat with user
+								if (!chatMessage.SenderUserName.equals(ChatController.ReciverUserName)) {
+									userPointer.Btn.setTextFill(Color.RED);
 								}
 							}
 							break;
+
 						case ChatMessage.WHOISIN:
-							myController.setUserList(chatMessage.WhoIsInUsers);
-							System.out.println(chatMessage.WhoIsInUsers);
+							chatController.setUsersList(chatMessage.OnlineUsers);
 							break;
-						case  ChatMessage.IsJoinedUserName:
-							myController.AddUserToUserList(chatMessage.JoinLeftUserName);
-							System.out.println(chatMessage.JoinLeftUserName);
+
+						case ChatMessage.IsJoinedUserName:
+							chatController.AddUserToUserList(chatMessage.JoinLeftUserName);
 							break;
+
 						case ChatMessage.IsLeftUserName:
-							myController.removeUserFromUserList(chatMessage.JoinLeftUserName);
-							System.out.println("second removed "+chatMessage.JoinLeftUserName);
+							chatController.removeUserFromUserList(chatMessage.JoinLeftUserName);
 							break;
+
 						case ChatMessage.CheckLogin:
 							Main m = new Main();
-							Main.ControllerName="Controller";
+							Main.ControllerName = "ChatController";
 							try {
 								m.changeScene("resources/Chat.fxml");
 							} catch (IOException e) {
@@ -226,7 +186,7 @@ public class Client  {
 
 				}
 				catch(IOException e) {
-					display(notif + "Server has closed the connection: " + e + notif);
+					display("Server has closed the connection: " + e);
 					break;
 				} catch (ClassNotFoundException e) {
 					e.printStackTrace();

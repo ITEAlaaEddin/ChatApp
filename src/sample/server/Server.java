@@ -1,18 +1,17 @@
 package sample.server;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import sample.ChatMessage;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-
 import java.util.Scanner;
 import java.util.Set;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.*;
-import sample.ChatMessage;
 
 
 // the server that can be run as a console
@@ -23,109 +22,92 @@ public class Server {
 	// an ArrayList to keep the list of the Client
 	public ArrayList<ClientThread> ListOfClients;
 	// the port number to listen for connection
-	private int port;
-	// to check if server is running
-	private boolean keepGoing;
-	private SimpleDateFormat sdf;
+	private final int port;
+
+
+	private final SimpleDateFormat sdf;
 	Set<UserOfServer> Users;
-	
+
 	//constructor that receive the port to listen to for connection as parameter
 	public Server(int port) {
 		// the port
 		this.port = port;
 		// an ArrayList to keep the list of the Client
-		ListOfClients = new ArrayList<ClientThread>();
+		ListOfClients = new ArrayList<>();
 		sdf = new SimpleDateFormat("HH:mm:ss");
 
 	}
-	
-	public void start() {
+
+	public static <T> T fromJSON(final TypeReference<T> type, final String jsonPacket) {
+		T data = null;
+
 		try {
-			String data="";
-			File myObj = new File("C:\\Users\\Alaa Alaa Eddin\\IdeaProjects\\NetworksProjectt\\src\\sample\\server\\Users.json");
-			Scanner myReader = new Scanner(myObj);
-			while (myReader.hasNextLine()) {
-				data += myReader.nextLine();
-			}
-			myReader.close();
-			ObjectMapper mapper = new ObjectMapper();
-
-			Set<UserOfServer> properties = fromJSON(new TypeReference<Set<UserOfServer>>() {}, data);
-			Users=properties;
-		} catch (FileNotFoundException e) {
-			System.out.println("An error occurred.");
-			e.printStackTrace();
+			data = new ObjectMapper().readValue(jsonPacket, type);
+		} catch (Exception e) {
+			// Handle the problem
+			System.out.println("fromJSON" + e);
 		}
-
-
-		keepGoing = true;
-		//create socket server and wait for connection requests 
-		try 
-		{
-			// the socket used by the server
-			ServerSocket serverSocket = new ServerSocket(port);
-
-			// infinite loop to wait for connections ( till server is active )
-			while(keepGoing) 
-			{
-				display("Server waiting for Clients on port " + port + ".");
-				
-				// accept connection if requested from client
-				Socket socket = serverSocket.accept();
-				// break if server stoped
-				if(!keepGoing)
-					break;
-				// if client is connected, create its thread
-				ClientThread t = new ClientThread(socket);
-				//add this client to arraylist
-				ListOfClients.add(t);
-				
-				t.start();
-			}
-			// try to stop the server
-			try {
-				serverSocket.close();
-				for(int i = 0; i < ListOfClients.size(); ++i) {
-					ClientThread tc = ListOfClients.get(i);
-					try {
-					// close all data streams and socket
-					tc.sInput.close();
-					tc.sOutput.close();
-					tc.socket.close();
-					}
-					catch(IOException ioE) {
-					}
-				}
-			}
-			catch(Exception e) {
-				display("Exception closing the server and clients: " + e);
-			}
-		}
-		catch (IOException e) {
-            String msg = sdf.format(new Date()) + " Exception on new ServerSocket: " + e + "\n";
-			display(msg);
-		}
+		return data;
 	}
-	
+
 	// to stop the server
-	protected void stop() {
-		keepGoing = false;
-		try {
-			new Socket("localhost", port);
-		}
-		catch(Exception e) {
-		}
+
+	/*
+	 *  To run as a console application
+	 * > java Server
+	 * > java Server portNumber
+	 * If the port number is not specified 1500 is used
+	 */
+	public static void main(String[] args) {
+		// start server on port 1500 unless a PortNumber is specified
+		int portNumber = 1500;
+
+		// create a server object and start it
+		Server server = new Server(portNumber);
+		server.start();
 	}
-	
+
 	// Display an event to the console
 	private void display(String msg) {
 		String time = sdf.format(new Date()) + " " + msg;
 		System.out.println(time);
 	}
 
+	public void start() {
+
+
+		readDefultUsers();
+
+
+		//create socket server and wait for connection requests
+		try {
+			// the socket used by the server
+			ServerSocket serverSocket = new ServerSocket(port);
+
+			// infinite loop to wait for connections ( till server is active )
+			while (true) {
+				display("Server waiting for Clients on port " + port + ".");
+
+				// accept connection if requested from client
+				Socket socket = serverSocket.accept();
+
+				// if client is connected, create its thread
+				ClientThread t = new ClientThread(socket);
+				//add this client to arraylist
+				ListOfClients.add(t);
+
+				t.start();
+			}
+			// try to stop the server
+		}
+		catch (IOException e) {
+            String msg = sdf.format(new Date()) + " Exception on new ServerSocket: " + e + "\n";
+			display(msg);
+		}
+	}
+
 	private boolean checkLogin(ChatMessage chatMessage){
 
-	//	return chatMessage.Password.equals("alaa")&& chatMessage.SenderUserName.equals("alaa");
 
 		boolean isExist = false;
 		UserOfServer userr=null;
@@ -149,63 +131,78 @@ public class Server {
 				}
 
 			}
-			if(i>1){
-				isExist=false;
+			if (i > 1) {
+				isExist = false;
 
 			}
 
 		}
 
-		System.out.println(isExist);
 		return isExist;
 
 	}
 
-	public static <T> T fromJSON(final TypeReference<T> type,
-								 final String jsonPacket) {
-		T data = null;
-
+	private void readDefultUsers() {
 		try {
-			data = new ObjectMapper().readValue(jsonPacket, type);
-		} catch (Exception e) {
-			// Handle the problem
-			System.out.println("oo "+e);
+			StringBuilder data = new StringBuilder();
+			File myObj = new File("C:\\Users\\Alaa Alaa Eddin\\IdeaProjects\\NetworksProjectt\\src\\sample\\server\\Users.json");
+			Scanner myReader = new Scanner(myObj);
+			while (myReader.hasNextLine()) {
+				data.append(myReader.nextLine());
+			}
+			myReader.close();
+
+			Set<UserOfServer> properties = fromJSON(new TypeReference<Set<UserOfServer>>() {
+			}, data.toString());
+			Users = properties;
+		} catch (FileNotFoundException e) {
+			System.out.println("An error occurred.");
+			e.printStackTrace();
 		}
-		return data;
 	}
-	
+
+	// if client sent LOGOUT message to exit
+	synchronized void remove(int id) {
+
+		String disconnectedClient = "";
+		// scan the array list until we found the Id
+		for (ClientThread ct : ListOfClients) {
+			// if found remove it
+			if (ct.id == id) {
+				disconnectedClient = ct.getUsername();
+				ListOfClients.remove(ct);
+				break;
+			}
+		}
+		ChatMessage left = new ChatMessage(ChatMessage.IsLeftUserName, disconnectedClient);
+		left.ReceiverUserName = "brodcast";
+		broadcast(left);
+	}
+
 	// to broadcast a message to all Clients
 	private synchronized boolean broadcast(ChatMessage chatMessage) {
 
-		boolean found=false;
-		boolean isPrivate = true;
+		boolean found = false;
 
-		if(chatMessage.ReceiverUserName.equalsIgnoreCase("brodcast"))
-			isPrivate=false;
-
-		if(isPrivate){
+		if (!chatMessage.ReceiverUserName.equalsIgnoreCase("brodcast")) {
 
 			// we loop in reverse order to find the mentioned username
-			for(ClientThread ct1 : ListOfClients)
-			{
-				if(ct1.getUsername().equals(chatMessage.ReceiverUserName))
-				{
+			for (ClientThread ct1 : ListOfClients) {
+				if (ct1.getUsername().equals(chatMessage.ReceiverUserName)) {
 					// try to write to the Client if it fails remove it from the list
 
-					if(!ct1.writeMsg(chatMessage)) {
+					if (!ct1.writeMsg(chatMessage)) {
 						ListOfClients.remove(ct1);
 						display("Disconnected Client " + ct1.username + " removed from list.");
 					}
 					// username found and delivered the message
-					found=true;
+					found = true;
 					break;
 				}
 			}
 			// mentioned user not found, return false
-			if(found!=true)
-			{
-				return false;
-			}
+			return !found;
+
 
 		}
 
@@ -228,55 +225,6 @@ public class Server {
 
 	}
 
-	// if client sent LOGOUT message to exit
-	synchronized void remove(int id) {
-		
-		String disconnectedClient = "";
-		// scan the array list until we found the Id
-		for(ClientThread ct:ListOfClients) {
-			// if found remove it
-			if(ct.id == id) {
-				disconnectedClient = ct.getUsername();
-				ListOfClients.remove(ct);
-				break;
-			}
-		}
-		ChatMessage left = new ChatMessage(ChatMessage.IsLeftUserName,disconnectedClient);
-		left.ReceiverUserName= "brodcast";
-		broadcast(left);
-	}
-	
-	/*
-	 *  To run as a console application
-	 * > java Server
-	 * > java Server portNumber
-	 * If the port number is not specified 1500 is used
-	 */ 
-	public static void main(String[] args) {
-		// start server on port 1500 unless a PortNumber is specified 
-		int portNumber = 1500;
-		switch(args.length) {
-			case 1:
-				try {
-					portNumber = Integer.parseInt(args[0]);
-				}
-				catch(Exception e) {
-					System.out.println("Invalid port number.");
-					System.out.println("Usage is: > java Server [portNumber]");
-					return;
-				}
-			case 0:
-				break;
-			default:
-				System.out.println("Usage is: > java Server [portNumber]");
-				return;
-				
-		}
-		// create a server object and start it
-		Server server = new Server(portNumber);
-		server.start();
-	}
-
 	// One instance of this thread will run for each client
 	class ClientThread extends Thread {
 		// the socket to get messages from client
@@ -297,22 +245,22 @@ public class Server {
 			this.socket = socket;
 			//Creating both Data Stream
 			System.out.println("Thread trying to create Object Input/Output Streams");
-			try
-			{
+			try {
 				sOutput = new ObjectOutputStream(socket.getOutputStream());
-				sInput  = new ObjectInputStream(socket.getInputStream());
+				sInput = new ObjectInputStream(socket.getInputStream());
 				// read the username
-				ChatMessage chatMessage= (ChatMessage) sInput.readObject();
+				ChatMessage chatMessage = (ChatMessage) sInput.readObject();
 				username = chatMessage.SenderUserName;
-				ChatMessage join = new ChatMessage(ChatMessage.IsJoinedUserName,username);
+				ChatMessage join = new ChatMessage(ChatMessage.IsJoinedUserName, username);
 				join.ReceiverUserName = "brodcast";
 				broadcast(join);
+				System.out.println(username + " is joined");
 			}
 			catch (IOException e) {
 				display("Exception creating new Input/output Streams: " + e);
-				return;
 			}
 			catch (ClassNotFoundException e) {
+				System.out.println(e.toString());
 			}
 		}
 		
@@ -320,9 +268,6 @@ public class Server {
 			return username;
 		}
 
-		public void setUsername(String username) {
-			this.username = username;
-		}
 
 		// infinite loop to read and forward message
 		public void run() {
@@ -340,48 +285,39 @@ public class Server {
 				catch(ClassNotFoundException e2) {
 					break;
 				}
-				// get the message from the ChatMessage object received
-				String message = chatMessage.getMessage();
+
 
 				// different actions based on type message
 				switch(chatMessage.getType()) {
 
-				case ChatMessage.MESSAGE:
-					boolean confirmation =  broadcast(chatMessage);
-					if(confirmation==false){
-						System.out.println( "***" + "User is trying to send message to offline user" + "***");
-					}
-					break;
-				case ChatMessage.LOGOUT:
-					display(username + " disconnected with a LOGOUT message.");
-					keepGoing = false;
-					break;
-				case ChatMessage.WHOISIN:
-					ChatMessage chatMessage2 = new ChatMessage(ChatMessage.WHOISIN,"");
-					for(ClientThread client:ListOfClients){
-						if(client.id==this.id)
-							continue;
-						chatMessage2.WhoIsInUsers.add(client.username);
-					}
-					writeMsg(chatMessage2);
-					System.out.println(chatMessage2.WhoIsInUsers);
-					break;
-				case ChatMessage.CheckLogin:
-						if(checkLogin(chatMessage)){
-							ChatMessage chatMessage1 = new ChatMessage(ChatMessage.CheckLogin, chatMessage.SenderUserName, chatMessage.Password);
+					case ChatMessage.MESSAGE:
+						boolean confirmation = broadcast(chatMessage);
+						if (!confirmation) {
+							System.out.println("***" + "User is trying to send message to offline user" + "***");
+						}
+						break;
+					case ChatMessage.LOGOUT:
+						display(username + " disconnected with a LOGOUT message.");
+						keepGoing = false;
+						break;
+					case ChatMessage.WHOISIN:
+						ArrayList<String> onlineUsers = new ArrayList<>();
+						for (ClientThread client : ListOfClients) {
+							if (client.id == this.id)
+								continue;
+							onlineUsers.add(client.username);
+						}
+						writeMsg(new ChatMessage(ChatMessage.WHOISIN, onlineUsers));
+						System.out.println(onlineUsers);
+						break;
+					case ChatMessage.CheckLogin:
+						if (checkLogin(chatMessage)) {
+							ChatMessage chatMessage1 = new ChatMessage(ChatMessage.CheckLogin);
 							chatMessage1.ReceiverUserName = chatMessage.SenderUserName;
 							broadcast(chatMessage1);
 
-						}
-						else
-							close();
-						break;
-
-
-
-
-
-
+						} else
+							break;
 
 				}
 			}
@@ -393,17 +329,13 @@ public class Server {
 		// close everything
 		private void close() {
 			try {
-				if(sOutput != null) sOutput.close();
+				if (sOutput != null) sOutput.close();
+				if (sInput != null) sInput.close();
+				if (socket != null) socket.close();
+			} catch (Exception e) {
+				System.out.println(e.toString());
 			}
-			catch(Exception e) {}
-			try {
-				if(sInput != null) sInput.close();
-			}
-			catch(Exception e) {};
-			try {
-				if(socket != null) socket.close();
-			}
-			catch (Exception e) {}
+
 		}
 
 		// write a String to the Client output stream

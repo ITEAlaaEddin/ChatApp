@@ -17,40 +17,45 @@ public class ChatMessage implements Serializable {
 	// WHOISIN to receive the list of the users connected
 	// MESSAGE an ordinary text message
 	// LOGOUT to disconnect from the Server
-	public static final int WHOISIN = 0, MESSAGE = 1, LOGOUT = 2, IsLeftUserName = 3,IsJoinedUserName=4,CheckLogin =5;
+	public static final int WHOISIN = 0, MESSAGE = 1, LOGOUT = 2, IsLeftUserName = 3, IsJoinedUserName = 4, CheckLogin = 5;
 	public int type;
-	public String message;
-	public String SenderUserName = "",ReceiverUserName = "",JoinLeftUserName ="";
-	public String Password;
-	public ArrayList<String>  WhoIsInUsers = new ArrayList<String>();
+	public String SenderUserName, ReceiverUserName, JoinLeftUserName, Password, Message;
+	public ArrayList<String> OnlineUsers = new ArrayList<>();
 	public SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
 	public String Date;
-	public boolean FromOther= true;
+	public boolean FromOther = true;
+
 	// constructor
-	public ChatMessage(int type, String message, String SenderUserName, String ReceiverUserName) {
+	public ChatMessage(int type, String message, String senderUserName, String receiverUserName) {
 		this.type = type;
-		this.message = message;
-		this.ReceiverUserName=ReceiverUserName;
-		this.SenderUserName=SenderUserName;
+		this.Message = message;
+		this.ReceiverUserName = receiverUserName;
+		this.SenderUserName = senderUserName;
 		this.Date = this.sdf.format(new Date());
 	}
 
 	public ChatMessage(int type, String JoinLeftUserName) {
 		this.type = type;
-		this.JoinLeftUserName=JoinLeftUserName;
+		this.JoinLeftUserName = JoinLeftUserName;
 	}
 
 	public ChatMessage(int type, String userName, String password) {
 		this.type = type;
-		this.SenderUserName=userName;
-		this.Password=password;
+		this.SenderUserName = userName;
+		this.Password = password;
 	}
-	
+
+	public ChatMessage(int type, ArrayList<String> onlineUsers) {
+		this.type = type;
+		this.OnlineUsers = onlineUsers;
+	}
+
+	public ChatMessage(int type) {
+		this.type = type;
+	}
+
 	public int getType() {
 		return type;
 	}
 
-	public String getMessage() {
-		return message;
-	}
 }

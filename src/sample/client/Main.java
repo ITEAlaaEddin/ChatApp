@@ -5,7 +5,6 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -14,7 +13,7 @@ import java.io.IOException;
 
 public class Main extends Application {
 
-    public static ChatController Controller;
+    public static ChatController ChatController;
     public static LoginController LoginController;
     public static String ControllerName;
     public static Stage stg;
@@ -41,8 +40,8 @@ public class Main extends Application {
     public void changeScene(String fxml) throws IOException {
         FXMLLoader fmxlLoader = new FXMLLoader(getClass().getResource(fxml));
         Parent window = (Pane) fmxlLoader.load();
-        if(ControllerName.equalsIgnoreCase("Controller"))
-            Controller = fmxlLoader.<ChatController>getController();
+        if (ControllerName.equalsIgnoreCase("ChatController"))
+            ChatController = fmxlLoader.getController();
         else
             LoginController = fmxlLoader.<LoginController>getController();
         stg.getScene().setRoot(window);
