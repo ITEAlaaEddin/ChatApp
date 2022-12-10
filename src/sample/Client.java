@@ -191,7 +191,10 @@ public class Client  {
 							}
 							if(ouser!=null) {
 								ouser.Messages.add(chatMessage);
-								ouser.Btn.setTextFill(Color.RED);
+								if(!chatMessage.SenderUserName.equals(Controller.ReciverUserName))
+								{
+									ouser.Btn.setTextFill(Color.RED);
+								}
 							}
 							break;
 						case ChatMessage.WHOISIN:

@@ -58,7 +58,6 @@ public class Controller {
     public  void AddUserToUserList(String userName){
         User user = new User(userName);
         Users.add(user);
-
         Platform.runLater(() -> {
             list_users.getItems().add(user.Btn);
         });
@@ -78,6 +77,13 @@ public class Controller {
         }
 
     }
+   // new 0000000000000000000000000000000000000000000000000000000000000000000000
+    private void autoScrollMessageList() {
+        if (list_show.getItems().size() > 10/*where size equals possible items to display*/) {
+            list_show.scrollTo(list_show.getItems().size() - 1);
+        }
+    }
+
     public void setText_show(ChatMessage chatMessage){
 
         Task<HBox> othersMessages = new Task<HBox>() {
@@ -97,6 +103,7 @@ public class Controller {
 
         othersMessages.setOnSucceeded(event -> {
             list_show.getItems().add(othersMessages.getValue());
+            autoScrollMessageList();
         });
        // ouser.Messages.getItems().add(othersMessages.getValue());
 
@@ -119,6 +126,7 @@ public class Controller {
         };
         yourMessages.setOnSucceeded(event ->{
             list_show.getItems().add(yourMessages.getValue());
+            autoScrollMessageList();
 
                 }
         );
@@ -135,8 +143,6 @@ public class Controller {
             t.setDaemon(true);
             t.start();
         }
-
-
     }
     public void initialize(){
         client = LoginController.MyClient;
