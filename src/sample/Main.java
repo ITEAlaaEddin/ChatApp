@@ -13,6 +13,7 @@ import java.util.Scanner;
 public class Main extends Application {
 
     public static Controller Controller;
+    public static LoginController LoginController;
     public static String ControllerName;
     private static Stage stg;
     @Override
@@ -32,6 +33,8 @@ public class Main extends Application {
         Parent window = (Pane) fmxlLoader.load();
         if(ControllerName.equalsIgnoreCase("Controller"))
             Controller = fmxlLoader.<Controller>getController();
+        else
+            LoginController = fmxlLoader.<LoginController>getController();
         stg.getScene().setRoot(window);
 
     }

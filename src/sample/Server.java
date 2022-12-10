@@ -1,13 +1,23 @@
 package sample;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+
+import java.util.Scanner;
+import java.util.Set;
+
+import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.*;
+
+
+import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.databind.*;
+import com.sun.deploy.panel.AbstractRadioPropertyGroup;
 
 
 // the server that can be run as a console
@@ -22,6 +32,7 @@ public class Server {
 	// to check if server is running
 	private boolean keepGoing;
 	private SimpleDateFormat sdf;
+	Set<UserOfServer> Users;
 	
 	//constructor that receive the port to listen to for connection as parameter
 	public Server(int port) {
@@ -30,9 +41,28 @@ public class Server {
 		// an ArrayList to keep the list of the Client
 		ListOfClients = new ArrayList<ClientThread>();
 		sdf = new SimpleDateFormat("HH:mm:ss");
+
 	}
 	
 	public void start() {
+		try {
+			String data="";
+			File myObj = new File("C:\\Users\\Alaa Alaa Eddin\\IdeaProjects\\NetworksProjectt\\src\\sample\\Users.json");
+			Scanner myReader = new Scanner(myObj);
+			while (myReader.hasNextLine()) {
+				data += myReader.nextLine();
+			}
+			myReader.close();
+			ObjectMapper mapper = new ObjectMapper();
+
+			Set<UserOfServer> properties = fromJSON(new TypeReference<Set<UserOfServer>>() {}, data);
+			Users=properties;
+		} catch (FileNotFoundException e) {
+			System.out.println("An error occurred.");
+			e.printStackTrace();
+		}
+
+
 		keepGoing = true;
 		//create socket server and wait for connection requests 
 		try 
@@ -96,6 +126,36 @@ public class Server {
 	private void display(String msg) {
 		String time = sdf.format(new Date()) + " " + msg;
 		System.out.println(time);
+	}
+
+	private boolean checkLogin(ChatMessage chatMessage){
+
+	//	return chatMessage.Password.equals("alaa")&& chatMessage.SenderUserName.equals("alaa");
+
+		boolean isExist = false;
+		for(UserOfServer user:Users){
+
+			if(user.getUserName().equals(chatMessage.SenderUserName) && user.getPassword().equals(chatMessage.Password)){
+					isExist=true;
+					break;
+			}
+		}
+		System.out.println(isExist);
+		return isExist;
+
+	}
+
+	public static <T> T fromJSON(final TypeReference<T> type,
+								 final String jsonPacket) {
+		T data = null;
+
+		try {
+			data = new ObjectMapper().readValue(jsonPacket, type);
+		} catch (Exception e) {
+			// Handle the problem
+			System.out.println("oo "+e);
+		}
+		return data;
 	}
 	
 	// to broadcast a message to all Clients
@@ -281,14 +341,31 @@ public class Server {
 					keepGoing = false;
 					break;
 				case ChatMessage.WHOISIN:
-					ChatMessage chatMessage = new ChatMessage(ChatMessage.WHOISIN,"");
+					ChatMessage chatMessage2 = new ChatMessage(ChatMessage.WHOISIN,"");
 					for(ClientThread client:ListOfClients){
 						if(client.id==this.id)
 							continue;
-						chatMessage.WhoIsInUsers.add(client.username);
+						chatMessage2.WhoIsInUsers.add(client.username);
 					}
-					writeMsg(chatMessage);
+					writeMsg(chatMessage2);
 					break;
+				case ChatMessage.CheckLogin:
+						if(checkLogin(chatMessage)){
+							ChatMessage chatMessage1 = new ChatMessage(ChatMessage.CheckLogin, chatMessage.SenderUserName, chatMessage.Password);
+							chatMessage1.ReceiverUserName = chatMessage.SenderUserName;
+							broadcast(chatMessage1);
+
+						}
+						else
+							close();
+						break;
+
+
+
+
+
+
+
 				}
 			}
 			// if out of the loop then disconnected and remove from client list

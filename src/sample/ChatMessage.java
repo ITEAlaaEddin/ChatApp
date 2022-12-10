@@ -17,10 +17,11 @@ public class ChatMessage implements Serializable {
 	// WHOISIN to receive the list of the users connected
 	// MESSAGE an ordinary text message
 	// LOGOUT to disconnect from the Server
-	static final int WHOISIN = 0, MESSAGE = 1, LOGOUT = 2, IsLeftUserName = 3,IsJoinedUserName=4;
+	static final int WHOISIN = 0, MESSAGE = 1, LOGOUT = 2, IsLeftUserName = 3,IsJoinedUserName=4,CheckLogin =5;
 	private int type;
 	public String message;
 	public String SenderUserName = "",ReceiverUserName = "",JoinLeftUserName ="";
+	public String Password;
 	public ArrayList<String>  WhoIsInUsers = new ArrayList<String>();
 	public SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
 	public String Date;
@@ -37,6 +38,12 @@ public class ChatMessage implements Serializable {
 	ChatMessage(int type,String JoinLeftUserName) {
 		this.type = type;
 		this.JoinLeftUserName=JoinLeftUserName;
+	}
+
+	ChatMessage(int type,String userName,String password) {
+		this.type = type;
+		this.SenderUserName=userName;
+		this.Password=password;
 	}
 	
 	int getType() {

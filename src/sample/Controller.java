@@ -147,8 +147,7 @@ public class Controller {
     public void initialize(){
         client = LoginController.MyClient;
         //client.getUsers();
-         if(!client.start())
-             return;
+
         client.sendMessage(new ChatMessage(ChatMessage.WHOISIN,""));
         HBox x = new HBox();
 
