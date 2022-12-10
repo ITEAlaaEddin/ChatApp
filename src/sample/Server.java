@@ -238,7 +238,7 @@ public class Server {
 	 */ 
 	public static void main(String[] args) {
 		// start server on port 1500 unless a PortNumber is specified 
-		int portNumber = 1502;
+		int portNumber = 1500;
 		switch(args.length) {
 			case 1:
 				try {
@@ -348,6 +348,7 @@ public class Server {
 						chatMessage2.WhoIsInUsers.add(client.username);
 					}
 					writeMsg(chatMessage2);
+					System.out.println(chatMessage2.WhoIsInUsers);
 					break;
 				case ChatMessage.CheckLogin:
 						if(checkLogin(chatMessage)){

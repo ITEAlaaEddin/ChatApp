@@ -204,6 +204,7 @@ public class Client  {
 							break;
 						case ChatMessage.WHOISIN:
 							myController.setUserList(chatMessage.WhoIsInUsers);
+							System.out.println(chatMessage.WhoIsInUsers);
 							break;
 						case  ChatMessage.IsJoinedUserName:
 							myController.AddUserToUserList(chatMessage.JoinLeftUserName);
@@ -221,8 +222,7 @@ public class Client  {
 							} catch (IOException e) {
 								e.printStackTrace();
 							}
-						default:
-							throw new IOException();
+
 
 					}
 
