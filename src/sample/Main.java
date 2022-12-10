@@ -23,7 +23,7 @@ public class Main extends Application {
         FXMLLoader fmxlLoader = new FXMLLoader(getClass().getResource("Login.fxml"));
         Parent window = (Pane) fmxlLoader.load();
         //Controller = fmxlLoader.<Controller>getController();
-        primaryStage.setTitle("AIS Chat App");
+        primaryStage.setTitle("AIH Chat App");
         primaryStage.setScene(new Scene(window, 800, 500));
         primaryStage.show();
     }
