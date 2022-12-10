@@ -2,16 +2,13 @@ package sample;
 
 import javafx.event.Event;
 import javafx.event.EventHandler;
-import javafx.scene.control.ListView;
 
-import java.awt.*;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 import javafx.scene.control.Button;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.paint.Color;
-import sun.security.jca.GetInstance;
+
 
 public class User {
 

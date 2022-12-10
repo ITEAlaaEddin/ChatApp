@@ -1,14 +1,15 @@
 package sample;
 
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import java.io.IOException;
-import java.util.Scanner;
 
 public class Main extends Application {
 
@@ -19,6 +20,13 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         stg=primaryStage;
+        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent e) {
+
+                System.exit(0);
+            }
+        });
         //Parent root = FXMLLoader.load(getClass().getResource("Login.fxml"));
         FXMLLoader fmxlLoader = new FXMLLoader(getClass().getResource("Login.fxml"));
         Parent window = (Pane) fmxlLoader.load();

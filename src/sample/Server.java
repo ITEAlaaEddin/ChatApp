@@ -10,14 +10,8 @@ import java.util.Date;
 import java.util.Scanner;
 import java.util.Set;
 
-import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
-
-
-import com.fasterxml.jackson.core.*;
-import com.fasterxml.jackson.databind.*;
-import com.sun.deploy.panel.AbstractRadioPropertyGroup;
 
 
 // the server that can be run as a console
@@ -133,13 +127,34 @@ public class Server {
 	//	return chatMessage.Password.equals("alaa")&& chatMessage.SenderUserName.equals("alaa");
 
 		boolean isExist = false;
+		UserOfServer userr=null;
 		for(UserOfServer user:Users){
 
 			if(user.getUserName().equals(chatMessage.SenderUserName) && user.getPassword().equals(chatMessage.Password)){
-					isExist=true;
-					break;
+				userr=user;
+				isExist=true;
+				break;
 			}
 		}
+
+
+		if(userr!=null){
+			int i=0;
+			for(ClientThread client:ListOfClients){
+
+				if(client.username.equals(userr.getUserName())){
+					i++;
+
+				}
+
+			}
+			if(i>1){
+				isExist=false;
+
+			}
+
+		}
+
 		System.out.println(isExist);
 		return isExist;
 

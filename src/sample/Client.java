@@ -2,13 +2,10 @@ package sample;
 
 import javafx.scene.paint.Color;
 
-import java.awt.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Scanner;
 
 
 //The Client that can be run as a console
@@ -126,7 +123,7 @@ public class Client  {
 	/*
 	 * To send a message to the server
 	 */
-	void sendMessage(ChatMessage msg) {
+	public void sendMessage(ChatMessage msg) {
 		try {
 			sOutput.writeObject(msg);
 		}
