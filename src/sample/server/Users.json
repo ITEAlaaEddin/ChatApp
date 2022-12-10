@@ -10,9 +10,15 @@
   },
 
   {
-    "UserName" : "hss",
-    "Password" : "hss"
+    "UserName" : "hussein",
+    "Password" : "issa"
   },
+
+  {
+    "UserName" : "hamid",
+    "Password" : "hamid"
+  },
+
 
   {
     "UserName" : "admin",
