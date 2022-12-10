@@ -22,7 +22,7 @@ public class Client  {
 	private ObjectOutputStream sOutput;		// to write on the socket
 	private Socket socket;					// socket object
 
-	private String server, username;	// server and username
+	private String server, username,Password;	// server and username
 	private int port;					//port
 
 
@@ -42,10 +42,15 @@ public class Client  {
 	 *  username: the username
 	 */
 
-	Client(String server, int port, String username) {
+	Client(String server, int port, String username,String password) {
 		this.server = server;
 		this.port = port;
 		this.username = username;
+		this.Password=password;
+	}
+
+	public void confirmLogin(String password){
+		sendMessage(new ChatMessage(ChatMessage.CheckLogin,username,password));
 	}
 
 	/*
@@ -205,6 +210,14 @@ public class Client  {
 							myController.removeUserFromUserList(chatMessage.JoinLeftUserName);
 							System.out.println("second removed "+chatMessage.JoinLeftUserName);
 							break;
+						case ChatMessage.CheckLogin:
+							Main m = new Main();
+							Main.ControllerName="Controller";
+							try {
+								m.changeScene("sample.fxml");
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
 						default:
 							throw new IOException();
 

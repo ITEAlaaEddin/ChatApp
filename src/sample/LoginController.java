@@ -25,20 +25,31 @@ public class LoginController {
 
     public void initialize(){
 
+
         button_login.setOnMouseReleased(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                MyClient = new Client(text_ip.getText(), Integer.parseInt(text_port.getText()), text_userName.getText());
-                Main m = new Main();
-                Main.ControllerName="Controller";
-                try {
-                    m.changeScene("sample.fxml");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                MyClient = new Client(text_ip.getText(), Integer.parseInt(text_port.getText()), text_userName.getText(),text_password.getText());
 
+                //MyClient = LoginController.MyClient;
+                //client.getUsers();
+                if(!MyClient.start())
+                    return;
+                MyClient.confirmLogin(text_password.getText());
+                //MyClient.sendMessage(new ChatMessage(ChatMessage.CheckLogin,MyClient.getUsername(),text_password.getText()));
 
             }
         });
+
+    }
+
+    public void changeScene(){
+        Main m = new Main();
+        Main.ControllerName="Controller";
+        try {
+            m.changeScene("Controller.fxml");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
