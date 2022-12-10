@@ -1,4 +1,4 @@
-package sample;
+package sample.client.bubble;
 
 public enum BubbleSpec {
 	

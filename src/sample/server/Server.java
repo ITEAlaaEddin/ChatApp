@@ -1,4 +1,4 @@
-package sample;
+package sample.server;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -12,6 +12,7 @@ import java.util.Set;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
+import sample.ChatMessage;
 
 
 // the server that can be run as a console
@@ -41,7 +42,7 @@ public class Server {
 	public void start() {
 		try {
 			String data="";
-			File myObj = new File("C:\\Users\\Alaa Alaa Eddin\\IdeaProjects\\NetworksProjectt\\src\\sample\\Users.json");
+			File myObj = new File("C:\\Users\\Alaa Alaa Eddin\\IdeaProjects\\NetworksProjectt\\src\\sample\\server\\Users.json");
 			Scanner myReader = new Scanner(myObj);
 			while (myReader.hasNextLine()) {
 				data += myReader.nextLine();

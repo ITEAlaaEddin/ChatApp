@@ -1,10 +1,11 @@
-package sample;
+package sample.client;
 
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -13,10 +14,11 @@ import java.io.IOException;
 
 public class Main extends Application {
 
-    public static Controller Controller;
+    public static ChatController Controller;
     public static LoginController LoginController;
     public static String ControllerName;
-    private static Stage stg;
+    public static Stage stg;
+    public static Scene scene;
     @Override
     public void start(Stage primaryStage) throws Exception{
         stg=primaryStage;
@@ -28,11 +30,11 @@ public class Main extends Application {
             }
         });
         //Parent root = FXMLLoader.load(getClass().getResource("Login.fxml"));
-        FXMLLoader fmxlLoader = new FXMLLoader(getClass().getResource("Login.fxml"));
+        FXMLLoader fmxlLoader = new FXMLLoader(getClass().getResource("resources/Login.fxml"));
         Parent window = (Pane) fmxlLoader.load();
         //Controller = fmxlLoader.<Controller>getController();
         primaryStage.setTitle("AIH Chat App");
-        primaryStage.setScene(new Scene(window, 800, 500));
+        primaryStage.setScene(new Scene(window, 820, 503));
         primaryStage.show();
     }
 
@@ -40,7 +42,7 @@ public class Main extends Application {
         FXMLLoader fmxlLoader = new FXMLLoader(getClass().getResource(fxml));
         Parent window = (Pane) fmxlLoader.load();
         if(ControllerName.equalsIgnoreCase("Controller"))
-            Controller = fmxlLoader.<Controller>getController();
+            Controller = fmxlLoader.<ChatController>getController();
         else
             LoginController = fmxlLoader.<LoginController>getController();
         stg.getScene().setRoot(window);

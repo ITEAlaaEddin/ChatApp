@@ -18,7 +18,7 @@ public class ChatMessage implements Serializable {
 	// MESSAGE an ordinary text message
 	// LOGOUT to disconnect from the Server
 	public static final int WHOISIN = 0, MESSAGE = 1, LOGOUT = 2, IsLeftUserName = 3,IsJoinedUserName=4,CheckLogin =5;
-	private int type;
+	public int type;
 	public String message;
 	public String SenderUserName = "",ReceiverUserName = "",JoinLeftUserName ="";
 	public String Password;
@@ -27,7 +27,7 @@ public class ChatMessage implements Serializable {
 	public String Date;
 	public boolean FromOther= true;
 	// constructor
-	ChatMessage(int type, String message, String SenderUserName , String ReceiverUserName) {
+	public ChatMessage(int type, String message, String SenderUserName, String ReceiverUserName) {
 		this.type = type;
 		this.message = message;
 		this.ReceiverUserName=ReceiverUserName;
@@ -35,22 +35,22 @@ public class ChatMessage implements Serializable {
 		this.Date = this.sdf.format(new Date());
 	}
 
-	ChatMessage(int type, String JoinLeftUserName) {
+	public ChatMessage(int type, String JoinLeftUserName) {
 		this.type = type;
 		this.JoinLeftUserName=JoinLeftUserName;
 	}
 
-	ChatMessage(int type, String userName, String password) {
+	public ChatMessage(int type, String userName, String password) {
 		this.type = type;
 		this.SenderUserName=userName;
 		this.Password=password;
 	}
 	
-	int getType() {
+	public int getType() {
 		return type;
 	}
 
-	String getMessage() {
+	public String getMessage() {
 		return message;
 	}
 }

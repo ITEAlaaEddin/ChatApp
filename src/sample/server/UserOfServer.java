@@ -1,4 +1,4 @@
-package sample;
+package sample.server;
 
 public class UserOfServer {
 

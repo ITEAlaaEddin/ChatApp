@@ -1,6 +1,7 @@
-package sample;
+package sample.client;
 
 import javafx.scene.paint.Color;
+import sample.ChatMessage;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -176,13 +177,13 @@ public class Client  {
 				try {
 					// read the message form the input datastream
 					ChatMessage chatMessage = (ChatMessage) sInput.readObject();
-					Controller myController= Main.Controller;
+					ChatController myController= Main.Controller;
 					switch (chatMessage.getType()){
 						case ChatMessage.MESSAGE:
 							// print the message
 							System.out.println(chatMessage.SenderUserName +": "+chatMessage.message);
 							System.out.print("> ");
-							if(chatMessage.SenderUserName.equals(Controller.ReciverUserName))
+							if(chatMessage.SenderUserName.equals(ChatController.ReciverUserName))
 							    myController.setText_show(chatMessage);
 							User ouser =null;
 							for(User user:myController.Users){
@@ -193,7 +194,7 @@ public class Client  {
 							}
 							if(ouser!=null) {
 								ouser.Messages.add(chatMessage);
-								if(!chatMessage.SenderUserName.equals(Controller.ReciverUserName))
+								if(!chatMessage.SenderUserName.equals(ChatController.ReciverUserName))
 								{
 									ouser.Btn.setTextFill(Color.RED);
 								}
@@ -215,7 +216,7 @@ public class Client  {
 							Main m = new Main();
 							Main.ControllerName="Controller";
 							try {
-								m.changeScene("sample.fxml");
+								m.changeScene("resources/Chat.fxml");
 							} catch (IOException e) {
 								e.printStackTrace();
 							}
